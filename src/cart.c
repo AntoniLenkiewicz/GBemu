@@ -20,7 +20,10 @@ int readCart(FILE *fp) {
     fread(cart, 1, size, fp);
     fclose(fp);
 
-    printf("%u\n", *(cart + 0x147));
+    for (int i = 0; i < 4; i++) {
+        printf("%.2x ", *(cart+0x0100 + i));
+    }
+    printf("\n00 c3 50 01 - Instruction check \n");
 
     return 0;
 }

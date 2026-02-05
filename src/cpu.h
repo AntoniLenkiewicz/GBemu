@@ -1,6 +1,7 @@
 #ifndef GBEMU_CPU_H
 #define GBEMU_CPU_H
 #include <stdint.h>
+
 typedef struct {
     uint8_t A;
     uint8_t F;
