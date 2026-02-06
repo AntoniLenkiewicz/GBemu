@@ -1,7 +1,8 @@
 #include "opcodes.h"
+#include "cpu.h"
 
 const OPCODE opcode_table[256] = {
-    {0x00, 1, 4, 0},
+    {0x00, 1, 4, 0, exec_nop},
 {0x01, 3, 12, 0},
 {0x02, 1, 8, 0},
 {0x03, 1, 8, 0},

@@ -5,6 +5,6 @@
 #include <stdint.h>
 
 FILE *openCart(char *cart);
-int readCart(FILE *fp);
+uint8_t *readCart(FILE *fp);
 
 #endif //GBEMU_CART_H

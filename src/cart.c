@@ -8,7 +8,7 @@ FILE *openCart(char *cart) {
     return fp;
 }
 
-int readCart(FILE *fp) {
+uint8_t *readCart(FILE *fp) {
     size_t size;
 
     fseek(fp, 0, SEEK_END);
@@ -25,6 +25,5 @@ int readCart(FILE *fp) {
     }
     printf("\n00 c3 50 01 - Instruction check \n");
 
-    return 0;
+    return cart;
 }
-

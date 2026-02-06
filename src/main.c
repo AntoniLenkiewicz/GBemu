@@ -8,7 +8,11 @@ int main(int argc, char *argv[]) {
     } else {
         FILE *fp;
         if (fp = openCart(argv[1])) {
-            readCart(fp);
+            uint8_t *cp;
+            if (cp = readCart(fp)) {
+                while (parse_instruction(cp))
+                    ;
+            }
         }
     }
     return 0;
