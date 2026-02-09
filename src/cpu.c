@@ -24,17 +24,31 @@ uint8_t parse_instruction(uint8_t *instruction_address) {
     if (*instruction_address == 0xcb) {
         instruction_address++;
         uint8_t opcode = *instruction_address;
-        cycles = cb_opcode_table[opcode].exec_opcode(opcode);
+        printf("%.2x", opcode);
+        cycles = cb_opcode_table[opcode].exec_opcode(instruction_address);
     } else {
         uint8_t opcode = *instruction_address;
         printf("%.2x\n", opcode);
-        cycles = opcode_table[opcode].exec_opcode(opcode);
+        cycles = opcode_table[opcode].exec_opcode(instruction_address);
     }
     return cycles;
 }
 
-uint8_t exec_nop(uint8_t opcode) {
+uint8_t exec_nop(uint8_t *opcode) {
     registers.PC += 1;
-    printf("Executed nop\n");
     return 1;
+}
+
+uint8_t exec_jp(uint8_t *opcode) {
+    uint8_t code = *opcode;
+    uint8_t cycles, take;
+    uint16_t address = opcode[1] | (opcode[2] << 8);
+    if (code == 0xc3) {
+        take = 1;
+        cycles = opcode_table[code].cycles;
+    }
+    if (take)
+        registers.PC = address;
+
+    return cycles;
 }
