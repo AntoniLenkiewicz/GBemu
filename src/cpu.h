@@ -20,5 +20,7 @@ uint8_t parse_instruction(uint8_t *instruction_address);
 
 uint8_t exec_nop(uint8_t *opcode);
 uint8_t exec_jp(uint8_t *opcode);
+uint8_t exec_xor (uint8_t *opcode);
+uint8_t exec_ld (uint8_t *opcode);
 
 #endif //GBEMU_CPU_H
