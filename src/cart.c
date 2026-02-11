@@ -1,5 +1,8 @@
 #include "cart.h"
 
+// Rom only for now so now bank switching needed
+
+
 FILE *openCart(char *cart) {
     FILE *fp;
     if (fp = fopen(cart, "rb")) {
@@ -24,6 +27,10 @@ uint8_t *readCart(FILE *fp) {
         printf("%.2x ", *(cart+0x0100 + i));
     }
     printf("\n00 c3 50 01 - Instruction check \n");
+
+    printf("Cartridge type: ");
+
+    printf("%.2x\n", *(cart + 0x100));
 
     return cart;
 }

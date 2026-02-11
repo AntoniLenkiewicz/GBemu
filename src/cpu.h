@@ -2,6 +2,9 @@
 #define GBEMU_CPU_H
 #include <stdint.h>
 #include "opcodes.h"
+#include "memory.h"
+#include <stdio.h>
+
 
 typedef struct {
     uint8_t A;

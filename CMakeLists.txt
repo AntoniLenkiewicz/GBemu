@@ -10,4 +10,6 @@ add_executable(GBemu
         src/cpu.c
         src/cpu.h
         src/opcodes.h
-        src/opcodes.c)
+        src/opcodes.c
+        src/memory.c
+        src/memory.h)

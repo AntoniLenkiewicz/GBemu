@@ -1,5 +1,4 @@
 #include "cpu.h"
-#include <stdio.h>
 
 static REGISTER registers = {
     0x0,
@@ -83,6 +82,14 @@ uint8_t exec_ld (uint8_t *opcode) {
         case 0x21:
             registers.H = opcode[1];
             registers.L = opcode[2];
+            break;
+        case 0x32:
+            uint16_t address;
+            address = (registers.H << 8) | registers.L;
+            write_mem(address, registers.A);
+            address--;
+            registers.H = (address >> 8);
+            registers.L = (address & 0xFF);
             break;
         default:
             return 0;
