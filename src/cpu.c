@@ -142,6 +142,90 @@ uint8_t exec_ld (uint8_t *opcode) {
         case 0x3e:
             registers.A = opcode[1];
             break;
+        case 0x40:
+            registers.B = registers.B;
+            break;
+        case 0x41:
+            registers.B = registers.C;
+            break;
+        case 0x42:
+            registers.B = registers.D;
+            break;
+        case 0x43:
+            registers.B = registers.E;
+            break;
+        case 0x44:
+            registers.B = registers.H;
+            break;
+        case 0x45:
+            registers.B = registers.L;
+            break;
+        case 0x47:
+            registers.B = registers.A;
+            break;
+        case 0x48:
+            registers.C = registers.B;
+            break;
+        case 0x49:
+            registers.C = registers.C;
+            break;
+        case 0x4A:
+            registers.C = registers.D;
+            break;
+        case 0x4B:
+            registers.C = registers.E;
+            break;
+        case 0x4C:
+            registers.C = registers.H;
+            break;
+        case 0x4D:
+            registers.C = registers.L;
+            break;
+        case 0x4F:
+            registers.C = registers.A;
+            break;
+        case 0x50:
+            registers.D = registers.B;
+            break;
+        case 0x51:
+            registers.D = registers.C;
+            break;
+        case 0x52:
+            registers.D = registers.D;
+            break;
+        case 0x53:
+            registers.D = registers.E;
+            break;
+        case 0x54:
+            registers.D = registers.H;
+            break;
+        case 0x55:
+            registers.D = registers.L;
+            break;
+        case 0x57:
+            registers.D = registers.A;
+            break;
+        case 0x58:
+            registers.E = registers.B;
+            break;
+        case 0x59:
+            registers.E = registers.C;
+            break;
+        case 0x5A:
+            registers.E = registers.D;
+            break;
+        case 0x5B:
+            registers.E = registers.E;
+            break;
+        case 0x5C:
+            registers.E = registers.H;
+            break;
+        case 0x5D:
+            registers.E = registers.L;
+            break;
+        case 0x5F:
+            registers.E = registers.A;
+            break;
         case 0xe0:
             address = 0xff00 | opcode[1];
             write_mem(address, registers.A);
