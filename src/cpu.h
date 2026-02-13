@@ -25,5 +25,9 @@ uint8_t exec_nop(uint8_t *opcode);
 uint8_t exec_jp(uint8_t *opcode);
 uint8_t exec_xor (uint8_t *opcode);
 uint8_t exec_ld (uint8_t *opcode);
-
+uint8_t exec_dec(uint8_t *opcode);
+uint8_t exec_jr(uint8_t *opcode);
+uint8_t exec_di(uint8_t *opcode);
+uint8_t exec_ei(uint8_t *opcode);
+uint8_t exec_cp(uint8_t *opcode);
 #endif //GBEMU_CPU_H

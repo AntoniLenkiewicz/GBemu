@@ -20,6 +20,9 @@ void write_mem(uint16_t address, uint8_t byte) {
 }
 
 uint8_t read_mem(uint16_t address) {
+    if (address == 0xff44) {
+        return 0x94;
+    }
     uint8_t byte;
     byte = memory[address];
     return byte;
