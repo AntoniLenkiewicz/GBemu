@@ -47,6 +47,19 @@ static void dec8(uint8_t *reg) {
         registers.F = registers.F | 0x80;
 
 }
+static void inc8(uint8_t *reg) {
+    registers.F &= ~0x20;
+    if ((*reg & 0x0F) == 0x0F)
+        registers.F = registers.F | 0x20;
+
+    registers.F &= ~0x40;
+
+    (*reg)++;
+
+    registers.F &= ~0x80;
+    if (*reg == 0)
+        registers.F = registers.F | 0x80;
+}
 
 static void hl_write(uint8_t value) {
     uint16_t address;
@@ -226,6 +239,69 @@ uint8_t exec_ld (uint8_t *opcode) {
         case 0x5F:
             registers.E = registers.A;
             break;
+        case 0x60:
+            registers.H = registers.B;
+            break;
+        case 0x61:
+            registers.H = registers.C;
+            break;
+        case 0x62:
+            registers.H = registers.D;
+            break;
+        case 0x63:
+            registers.H = registers.E;
+            break;
+        case 0x64:
+            registers.H = registers.H;
+            break;
+        case 0x65:
+            registers.H = registers.L;
+            break;
+        case 0x67:
+            registers.H = registers.A;
+            break;
+        case 0x68:
+            registers.L = registers.B;
+            break;
+        case 0x69:
+            registers.L = registers.C;
+            break;
+        case 0x6a:
+            registers.L = registers.D;
+            break;
+        case 0x6b:
+            registers.L = registers.E;
+            break;
+        case 0x6c:
+            registers.L = registers.H;
+            break;
+        case 0x6d:
+            registers.L = registers.L;
+            break;
+        case 0x6f:
+            registers.L = registers.A;
+            break;
+        case 0x78:
+            registers.A = registers.B;
+            break;
+        case 0x79:
+            registers.A = registers.C;
+            break;
+        case 0x7a:
+            registers.A = registers.D;
+            break;
+        case 0x7b:
+            registers.A = registers.E;
+            break;
+        case 0x7c:
+            registers.A = registers.H;
+            break;
+        case 0x7d:
+            registers.A = registers.L;
+            break;
+        case 0x7f:
+            registers.A = registers.A;
+            break;
         case 0xe0:
             address = 0xff00 | opcode[1];
             write_mem(address, registers.A);
@@ -251,6 +327,40 @@ uint8_t exec_ld (uint8_t *opcode) {
     return cycles;
 }
 
+uint8_t exec_inc (uint8_t *opcode) {
+    uint8_t cycles;
+    OPCODE instruction = opcode_table[*opcode];
+    switch (*opcode) {
+        case 0x04:
+            inc8(&registers.B);
+            break;
+        case 0x0c:
+            inc8(&registers.C);
+            break;
+        case 0x14:
+            inc8(&registers.D);
+            break;
+        case 0x1c:
+            inc8(&registers.E);
+            break;
+        case 0x24:
+            inc8(&registers.H);
+            break;
+        case 0x2c:
+            inc8(&registers.L);
+            break;
+        case 0x3c:
+            inc8(&registers.A);
+            break;
+        default:
+            return 0;
+    }
+    cycles = instruction.cycles;
+    registers.PC += instruction.bytes;
+
+    return cycles;
+}
+
 uint8_t exec_dec(uint8_t *opcode) {
     uint8_t cycles;
     OPCODE instruction = opcode_table[*opcode];
@@ -269,6 +379,9 @@ uint8_t exec_dec(uint8_t *opcode) {
             break;
         case 0x25:
             dec8(&registers.H);
+            break;
+        case 0x2d:
+            dec8(&registers.L);
             break;
         case 0x3d:
             dec8(&registers.A);
