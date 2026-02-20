@@ -20,9 +20,9 @@ uint8_t parse_instruction(uint8_t *instruction_address) {
     uint8_t cycles = 0;
     if (*instruction_address == 0xcb) {
         uint8_t opcode = instruction_address[1];
-        printf("cb\n");
-        printf("%.2x", opcode);
-        cycles = cb_opcode_table[opcode].exec_opcode(instruction_address);
+        printf("cb");
+        printf("%.2x\n", opcode);
+        cycles = cb_opcode_table[opcode].exec_opcode(++instruction_address);
     } else {
         uint8_t opcode = *instruction_address;
         printf("%.2x\n", opcode);
@@ -61,6 +61,35 @@ static void inc8(uint8_t *reg) {
         registers.F = registers.F | 0x80;
 }
 
+static void inc16(uint8_t *reg1, uint8_t *reg2) {
+    uint16_t value = (*reg1 << 8) | *reg2;
+    value--;
+    *reg1 = (value >> 8);
+    *reg2 = value;
+}
+
+static void dec16(uint8_t *reg1, uint8_t *reg2) {
+    uint16_t value = (*reg1 << 8) | *reg2;
+    value++;
+    *reg1 = (value >> 8);
+    *reg2 = value;
+}
+
+static void reg_or(uint8_t *reg) {
+    if (registers.A = registers.A | *reg)
+        registers.F = 0x80;
+    else
+        registers.F = 0x00;
+}
+
+static void reg_and(uint8_t *reg) {
+    registers.A &= *reg;
+    if (registers.A == 0)
+        registers.F = 0xa0;
+    else
+        registers.F = 0x20;
+}
+
 static void hl_write(uint8_t value) {
     uint16_t address;
     address = (registers.H << 8) | registers.L;
@@ -84,6 +113,12 @@ static void inc_hl() {
     hl++;
     registers.H = (hl >> 8);
     registers.L = (hl & 0xFF);
+}
+
+static void swap_nibbles(uint8_t *byte) {
+    uint8_t lower;
+    lower = (*byte) | 0x0f;
+    *byte = ((*byte) >> 4) | (lower << 4);
 }
 
 
@@ -123,11 +158,86 @@ uint8_t exec_xor (uint8_t *opcode) {
     return cycles;
 }
 
+uint8_t exec_or (uint8_t *opcode) {
+    uint8_t cycles;
+    OPCODE instruction = opcode_table[*opcode];
+    switch (*opcode) {
+        case 0xb0:
+            reg_or(&registers.B);
+        case 0xb1:
+            reg_or(&registers.C);
+            break;
+        case 0xb2:
+            reg_or(&registers.D);
+            break;
+        case 0xb3:
+            reg_or(&registers.E);
+            break;
+        case 0xb4:
+            reg_or(&registers.H);
+            break;
+        case 0xb5:
+            reg_or(&registers.L);
+            break;
+        case 0xb7:
+            reg_or(&registers.A);
+            break;
+        default:
+            return 0;
+    }
+
+    cycles = instruction.cycles;
+    registers.PC += instruction.bytes;
+
+    return cycles;
+}
+
+uint8_t exec_and(uint8_t *opcode) {
+    uint8_t cycles;
+    OPCODE instruction = opcode_table[*opcode];
+    switch (*opcode) {
+        case 0xa0:
+            reg_and(&registers.B);
+            break;
+        case 0xa1:
+            reg_and(&registers.C);
+            break;
+        case 0xa2:
+            reg_and(&registers.D);
+            break;
+        case 0xa3:
+            reg_and(&registers.E);
+            break;
+        case 0xa4:
+            reg_and(&registers.H);
+            break;
+        case 0xa5:
+            reg_and(&registers.L);
+            break;
+        case 0xa7:
+            reg_and(&registers.A);
+            break;
+        case 0xe6:
+            reg_and(&opcode[1]);
+            break;
+        default:
+            return 0;
+    }
+    cycles = instruction.cycles;
+    registers.PC += instruction.bytes;
+
+    return cycles;
+}
+
 uint8_t exec_ld (uint8_t *opcode) {
     uint8_t cycles;
     uint16_t address;
     OPCODE instruction = opcode_table[*opcode];
     switch (*opcode) {
+        case 0x01:
+            registers.B = opcode[2];
+            registers.C = opcode[1];
+            break;
         case 0x06:
             registers.B = opcode[1];
             break;
@@ -331,11 +441,17 @@ uint8_t exec_inc (uint8_t *opcode) {
     uint8_t cycles;
     OPCODE instruction = opcode_table[*opcode];
     switch (*opcode) {
+        case 0x03:
+            inc16(&registers.B, &registers.C);
+            break;
         case 0x04:
             inc8(&registers.B);
             break;
         case 0x0c:
             inc8(&registers.C);
+            break;
+        case 0x13:
+            inc16(&registers.D, &registers.E);
             break;
         case 0x14:
             inc8(&registers.D);
@@ -343,11 +459,17 @@ uint8_t exec_inc (uint8_t *opcode) {
         case 0x1c:
             inc8(&registers.E);
             break;
+        case 0x23:
+            inc16(&registers.H, &registers.L);
+            break;
         case 0x24:
             inc8(&registers.H);
             break;
         case 0x2c:
             inc8(&registers.L);
+            break;
+        case 0x33:
+            registers.SP++;
             break;
         case 0x3c:
             inc8(&registers.A);
@@ -368,11 +490,17 @@ uint8_t exec_dec(uint8_t *opcode) {
         case 0x05:
             dec8(&registers.B);
             break;
+        case 0x0b:
+            dec16(&registers.B, &registers.C);
+            break;
         case 0x0d:
             dec8(&registers.C);
             break;
         case 0x15:
             dec8(&registers.D);
+            break;
+        case 0x1b:
+            dec16(&registers.D, &registers.E);
             break;
         case 0x1d:
             dec8(&registers.E);
@@ -380,8 +508,14 @@ uint8_t exec_dec(uint8_t *opcode) {
         case 0x25:
             dec8(&registers.H);
             break;
+        case 0x2b:
+            dec16(&registers.H, &registers.L);
+            break;
         case 0x2d:
             dec8(&registers.L);
+            break;
+        case 0x3b:
+            registers.SP--;
             break;
         case 0x3d:
             dec8(&registers.A);
@@ -464,4 +598,87 @@ uint8_t exec_ei(uint8_t *opcode) {
     //for now just increment PC by one - needs rewriting once all other cpu instructions are finished
     registers.PC++;
     return 4;
+}
+
+uint8_t exec_call(uint8_t *opcode) {
+    uint8_t cycles;
+    uint16_t pc;
+    OPCODE instruction = opcode_table[*opcode];
+    switch (*opcode) {
+        case 0xcd:
+            pc = instruction.bytes + registers.PC;
+            registers.SP--;
+            write_mem(registers.SP, (uint8_t) (pc >> 8));
+            registers.SP--;
+            write_mem(registers.SP, (uint8_t) pc);
+            registers.PC = (opcode[2] << 8)| opcode[1];
+            break;
+        default:
+            return 0;
+    }
+    cycles = instruction.cycles;
+    return cycles;
+}
+
+uint8_t exec_ret(uint8_t *opcode) {
+    uint8_t cycles;
+    OPCODE instruction = opcode_table[*opcode];
+    switch (*opcode) {
+        case 0xc9:
+            registers.PC = read_mem(registers.SP);
+            registers.SP++;
+            registers.PC |= (read_mem(registers.SP) << 8);
+            registers.SP++;
+            break;
+        default:
+            return 0;
+    }
+
+    cycles = instruction.cycles;
+    registers.PC += instruction.bytes;
+
+    return cycles;
+}
+
+uint8_t exec_cpl(uint8_t *opcode) {
+    registers.A = ~registers.A;
+    registers.PC += opcode_table[*opcode].bytes;
+    registers.F |= 0x60;
+    return opcode_table[*opcode].cycles;
+}
+
+//CB instructions
+
+uint8_t exec_swap(uint8_t *opcode) {
+    uint8_t cycles, lower;
+    OPCODE instruction = cb_opcode_table[*opcode];
+    switch (*opcode) {
+        case 0x30:
+            swap_nibbles(&registers.B);
+            break;
+        case 0x31:
+            swap_nibbles(&registers.C);
+            break;
+        case 0x32:
+            swap_nibbles(&registers.D);
+            break;
+        case 0x33:
+            swap_nibbles(&registers.E);
+            break;
+        case 0x34:
+            swap_nibbles(&registers.H);
+            break;
+        case 0x35:
+            swap_nibbles(&registers.L);
+            break;
+        case 0x37:
+            swap_nibbles(&registers.A);
+            break;
+        default:
+            return 0;
+    }
+    cycles = instruction.cycles;
+    registers.PC += instruction.bytes;
+
+    return cycles;
 }
