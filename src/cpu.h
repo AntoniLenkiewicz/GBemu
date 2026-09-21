@@ -37,4 +37,6 @@ uint8_t exec_ret(uint8_t *opcode);
 uint8_t exec_cpl(uint8_t *opcode);
 uint8_t exec_and(uint8_t *opcode);
 uint8_t exec_swap(uint8_t *opcode);
+uint8_t exec_push(uint8_t *opcode);
+uint8_t exec_rst(uint8_t *opcode);
 #endif //GBEMU_CPU_H
