@@ -15,13 +15,38 @@
 
 static uint8_t memory[MEM_SIZE];
 
+uint8_t *returnMemoryPtr() {
+    return memory;
+}
+
 void write_mem(uint16_t address, uint8_t byte) {
+    if (address >= 0x0000 && address <= 0x7FFF) {
+        // Switching commands, ignore writes to the rom
+        return;
+    }
+    //Write to mirror and then work ram
+    if (address >= 0xE000 && address <= 0xFDFF) {
+        memory[address] = byte;
+        memory[address - 0x2000] = byte;
+        return;
+    }
+
+    //write to work ram and then to mirror
+    if (address >= 0xC000 && address <= 0xDFFF) {
+        memory[address] = byte;
+        memory[address + 0x2000] = byte;
+        return;
+    }
+    memory[address] = byte;
+}
+
+void write_rom(uint16_t address, uint8_t byte) {
     memory[address] = byte;
 }
 
 uint8_t read_mem(uint16_t address) {
     if (address == 0xff44) {
-        return 0x94;
+        return 0x90;
     }
     uint8_t byte;
     byte = memory[address];

@@ -19,6 +19,11 @@ typedef struct {
     uint16_t SP;
 } REGISTER;
 
+#define FLAG_Z 0x80
+#define FLAG_N 0x40
+#define FLAG_H 0x20
+#define FLAG_C 0x10
+
 uint8_t parse_instruction(uint8_t *instruction_address);
 
 uint8_t exec_nop(uint8_t *opcode);
@@ -39,4 +44,7 @@ uint8_t exec_and(uint8_t *opcode);
 uint8_t exec_swap(uint8_t *opcode);
 uint8_t exec_push(uint8_t *opcode);
 uint8_t exec_rst(uint8_t *opcode);
+uint8_t exec_add(uint8_t *opcode);
+uint8_t exec_pop(uint8_t *opcode);
+uint8_t exec_sub(uint8_t *opcode);
 #endif //GBEMU_CPU_H
