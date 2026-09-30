@@ -17,6 +17,10 @@ int main(int argc, char *argv[]) {
             for (uint16_t i = 0; i < 0x8000; i ++) {
                 write_rom(i, cp[i]);
             }
+            FILE *fptr;
+            fptr = fopen("log.txt", "w");
+            fprintf(fptr, "");
+            fclose(fptr);
             uint8_t *memPtr = returnMemoryPtr();
             while (parse_instruction(memPtr))
                 ;
