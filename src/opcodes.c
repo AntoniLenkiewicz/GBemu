@@ -41,7 +41,7 @@ const OPCODE opcode_table[256] = {
 {0x24, 1, 4, 0, exec_inc},
 {0x25, 1, 4, 0, exec_dec},
 {0x26, 2, 8, 0, exec_ld},
-{0x27, 1, 4, 0},
+{0x27, 1, 4, 0, exec_daa},
 {0x28, 2, 8, 12, exec_jr},
 {0x29, 1, 8, 0, exec_add},
 {0x2A, 1, 8, 0, exec_ld},

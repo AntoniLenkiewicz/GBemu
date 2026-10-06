@@ -52,4 +52,5 @@ uint8_t exec_srl(uint8_t *opcode);
 uint8_t exec_rr(uint8_t *opcode);
 uint8_t exec_rra(uint8_t *opcode);
 uint8_t exec_adc(uint8_t *opcode);
+uint8_t exec_daa(uint8_t *opcode);
 #endif //GBEMU_CPU_H

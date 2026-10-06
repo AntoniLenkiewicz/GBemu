@@ -1203,6 +1203,36 @@ uint8_t exec_ret(uint8_t *opcode) {
     return cycles;
 }
 
+uint8_t exec_daa(uint8_t *opcode) {
+    uint8_t adjustment = 0;
+    OPCODE instruction = opcode_table[*opcode];
+    if (FLAG_N & registers.F) {
+        if (FLAG_H & registers.F) {
+            adjustment += 0x06;
+        }
+        if (FLAG_C & registers.F) {
+            adjustment += 0x60;
+        }
+        registers.A -= adjustment;
+    } else {
+        if (FLAG_H & registers.F || (registers.A & 0x0F) > 0x09) {
+            adjustment += 0x06;
+        }
+        if (FLAG_C & registers.F || registers.A > 0x99) {
+            adjustment += 0x60;
+            registers.F |= FLAG_C;
+        }
+        registers.A += adjustment;
+    }
+    registers.F &= ~FLAG_Z;
+    if (registers.A == 0) {
+        registers.F |= FLAG_Z;
+    }
+    registers.F &= ~FLAG_H;
+    registers.PC += instruction.bytes;
+    return instruction.cycles;
+}
+
 uint8_t exec_cpl(uint8_t *opcode) {
     registers.A = ~registers.A;
     registers.PC += opcode_table[*opcode].bytes;
@@ -1408,10 +1438,6 @@ uint8_t exec_srl(uint8_t *opcode) {
     switch (*opcode) {
         case 0x38:
             byte = registers.B;
-            registers.F &= ~FLAG_Z;
-            if (!byte) {
-                registers.F |= FLAG_Z;
-            }
             registers.F &= ~FLAG_N;
             registers.F &= ~FLAG_H;
             registers.F &= ~FLAG_C;
@@ -1419,6 +1445,10 @@ uint8_t exec_srl(uint8_t *opcode) {
                 registers.F |= FLAG_C;
             }
             byte >>= 1;
+            registers.F &= ~FLAG_Z;
+            if (!byte) {
+                registers.F |= FLAG_Z;
+            }
             registers.B = byte;
             break;
 
