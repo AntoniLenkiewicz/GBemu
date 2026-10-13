@@ -22,8 +22,11 @@ int main(int argc, char *argv[]) {
             fprintf(fptr, "");
             fclose(fptr);
             uint8_t *memPtr = returnMemoryPtr();
+            openFile();
             while (parse_instruction(memPtr))
                 ;
+            sleep(1);
+            closeFile();
         }
     }
     return 0;

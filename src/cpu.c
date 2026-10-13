@@ -15,16 +15,24 @@ static REGISTER registers = {
     0xFFFE
 };
 
+static int counter = 0;
+
+static FILE *fptr;
+void openFile() {
+    fptr = fopen("log.txt", "a");
+}
+
+void closeFile() {
+    fclose(fptr);
+}
 /*want to parse instruction and call function to execute the instruction
  *pass bytes to exec function to execute function then return cycles*/
 uint8_t parse_instruction(uint8_t *instruction_address) {
+    counter++;
     instruction_address += registers.PC;
-    FILE *fptr;
-    fptr = fopen("log.txt", "a");
     fprintf(fptr, "A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X \n",
         registers.A, registers.F, registers.B, registers.C, registers.D, registers.E, registers.H, registers.L, registers.SP,
         registers.PC, read_mem(registers.PC), read_mem(registers.PC+1), read_mem(registers.PC+2), read_mem(registers.PC+3));
-    fclose(fptr);
     printf("PC:%.4x\n", registers.PC);
     uint8_t cycles = 0;
     if (*instruction_address == 0xcb) {
@@ -877,6 +885,7 @@ uint8_t exec_ld (uint8_t *opcode) {
         case 0x75:
             address = (uint16_t) registers.H << 8 | registers.L;
             write_mem(address, registers.L);
+            break;
         case 0x77:
             address = (registers.H << 8) | registers.L;
             write_mem(address, registers.A);
@@ -1238,6 +1247,16 @@ void ret() {
     registers.SP++;
 }
 
+uint8_t exec_reti(uint8_t *opcode) {
+    uint8_t cycles;
+    OPCODE instruction = opcode_table[*opcode];
+    switch (*opcode) {
+        default:
+            return 0;
+    }
+    cycles = instruction.cycles;
+    return cycles;
+}
 uint8_t exec_ret(uint8_t *opcode) {
     uint8_t take = 0;
     uint8_t cycles;

@@ -219,7 +219,7 @@ const OPCODE opcode_table[256] = {
 {0xD6, 2, 8, 0, exec_sub},
 {0xD7, 1, 16, 0, exec_rst},
 {0xD8, 1, 8, 20, exec_ret},
-{0xD9, 1, 16, 0},
+{0xD9, 1, 16, 0, exec_reti},
 {0xDA, 3, 12, 16, exec_jp},
 {0xDB, 1, 4, 0},
 {0xDC, 3, 12, 24, exec_call},
